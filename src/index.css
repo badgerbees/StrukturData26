@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500&family=Outfit:wght@300;400;600;800&display=swap');
+
+:root {
+  --factorio-orange: #ff9d00;
+  --factorio-dark: #1a1a1a;
+  --factorio-surface: #2d2d2d;
+  --factorio-iron: #7b7b7b;
+  --factorio-rust: #8b4513;
+}
+
+body {
+  margin: 0;
+  background-color: var(--factorio-dark);
+  color: #e0e0e0;
+  font-family: 'Outfit', sans-serif;
+  overflow-x: hidden;
+}
+
+.font-mono {
+  font-family: 'Fira Code', monospace;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--factorio-dark);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--factorio-orange);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e68a00;
+}
+
+/* Glassmorphism / Industrial panels */
+.panel {
+  background: rgba(45, 45, 45, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 157, 0, 0.2);
+  border-radius: 8px;
+}
+
+.terminal-window {
+  background-color: #0c0c0c;
+  border: 2px solid #333;
+  box-shadow: inset 0 0 10px #000;
+}
+
+.node-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border: 1px solid #444;
+}
+
+.node-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+  border-color: var(--factorio-orange);
+}
+
+@keyframes flash-red {
+  0% { background-color: rgba(220, 38, 38, 0.4); }
+  100% { background-color: transparent; }
+}
+
+.flash-red {
+  animation: flash-red 0.5s ease-out;
+}
+
+@keyframes flash-green {
+  0% { background-color: rgba(34, 197, 94, 0.4); }
+  100% { background-color: transparent; }
+}
+
+.flash-green {
+  animation: flash-green 0.5s ease-out;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
