@@ -1,33 +1,28 @@
-# Panduan Konsep: Arsitektur Pohon Teknologi (Tech Tree)
-## Tinjauan Strategis Implementasi Graph pada Silicon Forge Tycoon
+# Panduan Konseptual: Manajemen Dependensi Berbasis Graph
+## Filosofi Arsitektur Silicon Forge Tycoon
 
-Dokumen ini menjelaskan filosofi desain dan alasan konseptual di balik penggunaan struktur data Graph untuk mengelola sistem dependensi dalam aplikasi ini.
+Dokumen ini menyajikan tinjauan strategis mengenai penggunaan struktur data Graph sebagai kerangka kerja utama untuk mengelola kompleksitas hubungan antar komponen dalam sistem simulasi industri.
 
 ---
 
-### 1. Paradigma Graph sebagai Fondasi Dependensi
-Dalam sistem manufaktur atau simulasi industri, hubungan antar komponen jarang bersifat linier. Satu produk akhir seringkali bergantung pada beberapa komponen antara, yang mana komponen tersebut juga memiliki bahan baku dasarnya sendiri.
+### 1. Paradigma Graf dalam Sistem Manufaktur
+Dalam lingkungan produksi yang kompleks, hubungan antar material tidak bersifat linier melainkan hierarkis dan saling terkait. Struktur data **Graph** dipilih karena kemampuannya dalam merepresentasikan entitas (sebagai *Nodes*) dan hubungan dependensi (sebagai *Edges*) secara akurat dan skalabel.
 
-Struktur data **Graph** dipilih karena kemampuannya dalam memodelkan hubungan "Banyak-ke-Banyak" (Many-to-Many) secara efisien. Dalam konteks ini:
-- **Node (Vertex)**: Merepresentasikan entitas produk atau material.
-- **Edge (Sisi)**: Merepresentasikan alur produksi atau kebutuhan material.
+### 2. Integritas Logika dengan Directed Acyclic Graph (DAG)
+Permainan ini mengadopsi spesifikasi **DAG** untuk menjamin stabilitas sistem:
+- **Aliran Berarah (Directed)**: Menegaskan bahwa proses transformasi material memiliki urutan kronologis yang tetap (dari bahan mentah ke produk akhir).
+- **Struktur Acyclic**: Menghilangkan kemungkinan dependensi melingkar yang dapat menyebabkan kegagalan logika produksi atau kebocoran memori pada algoritma penelusuran.
 
-### 2. Implementasi Directed Acyclic Graph (DAG)
-Sistem ini menggunakan spesifikasi **DAG** untuk menjamin integritas logika produksi:
-- **Directed (Berarah)**: Menegaskan aliran proses produksi dari bahan mentah menuju produk akhir. Aliran ini bersifat searah (irreversible) untuk menjaga konsistensi logika manufaktur.
-- **Acyclic (Tanpa Siklus)**: Menjamin bahwa tidak ada dependensi melingkar yang dapat menyebabkan kegagalan sistem atau rekursi tak terbatas. Ini adalah standar industri dalam pemodelan manajemen proyek dan sistem *build*.
+### 3. Validasi Rantai Pasokan melalui DFS
+Proses verifikasi ketersediaan bahan dilakukan menggunakan metodologi **Depth-First Search (DFS)**. Strategi ini memungkinkan sistem untuk:
+- Melakukan penetrasi mendalam ke seluruh lapisan kebutuhan bahan baku secara sistematis.
+- Memastikan integritas setiap unit komponen dalam rantai pasokan sebelum mengeksekusi instruksi produksi.
+- Memberikan transparansi operasional melalui log penelusuran yang menunjukkan status setiap node dalam graf.
 
-### 3. Validasi dengan Depth-First Search (DFS)
-Untuk memastikan sebuah produk dapat diproduksi, sistem harus melakukan validasi menyeluruh terhadap seluruh rantai pasokan bahan bakunya. Algoritma **DFS** digunakan untuk melakukan penelusuran hierarkis ini:
-
-- **Eksplorasi Mendalam**: Sistem tidak hanya memeriksa kebutuhan langsung, tetapi melakukan penetrasi ke tingkat paling dasar (Tier 1) untuk memastikan setiap prasyarat terpenuhi.
-- **Integritas Rantai Produksi**: Dengan DFS, sistem dapat mengidentifikasi kegagalan pada titik mana pun dalam rantai dependensi sebelum proses pengurangan inventaris dilakukan.
-
-### 4. Nilai Strategis Struktur Data Graph
-Penggunaan Graph memberikan keunggulan kompetitif dalam pengembangan perangkat lunak:
-- **Skalabilitas Hierarkis**: Memungkinkan penambahan kompleksitas produk baru tanpa perlu mengubah algoritma pencarian.
-- **Efisiensi Validasi**: Penelusuran berbasis graf memastikan bahwa hanya jalur dependensi yang relevan yang diperiksa, menghemat sumber daya komputasi.
-- **Representasi Logika yang Akurat**: Memodelkan dunia nyata di mana satu bahan baku dapat digunakan untuk berbagai macam produk akhir (misalnya: Silikon digunakan baik untuk RAM maupun CPU).
+### 4. Optimalisasi dan Skalabilitas
+Penggunaan arsitektur berbasis graf memberikan keunggulan teknis berupa:
+- **Fleksibilitas Konfigurasi**: Penambahan atau perubahan resep produksi dapat dilakukan secara modular tanpa memengaruhi integritas mesin validasi inti.
+- **Efisiensi Komputasi**: Algoritma pencarian hanya mengeksplorasi jalur yang relevan dengan produk yang sedang divalidasi, memastikan performa aplikasi tetap optimal meskipun pohon teknologi berkembang luas.
 
 ---
 *Dokumen ini disusun untuk memberikan pemahaman tingkat tinggi mengenai arsitektur logika yang mendasari sistem simulasi industri ini.*
