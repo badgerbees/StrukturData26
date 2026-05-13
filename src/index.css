@@ -101,3 +101,29 @@ body {
 .animate-fade-in {
   animation: fade-in 0.3s ease-out forwards;
 }
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: #333;
+  border: 2px solid #0a0a0a;
+  border-radius: 10px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: var(--factorio-orange);
+}
+
+/* Ensure the terminal can take full height and scroll */
+.terminal-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}

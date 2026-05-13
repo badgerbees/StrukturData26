@@ -1,40 +1,84 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  FaGem, FaCube, FaMemory, FaDesktop, FaHammer, 
-  FaCogs, FaTerminal, FaRocket, FaRobot
+import {
+  FaGem, FaCube, FaMemory, FaDesktop, FaHammer,
+  FaCogs, FaTerminal, FaRocket, FaRobot, FaBolt,
+  FaServer, FaLaptop, FaTabletAlt, FaCarBattery, FaDatabase,
+  FaLayerGroup, FaMicrochip
 } from 'react-icons/fa';
-import { GiCircuitry, GiProcessor, GiDrill, GiMineWagon } from 'react-icons/gi';
+import {
+  GiCircuitry, GiProcessor, GiDrill, GiMineWagon,
+  GiMetalBar, GiStoneStack
+} from 'react-icons/gi';
 import { MdMemory, MdSettingsSuggest } from 'react-icons/md';
 import { Graph } from './logic/Graph';
 
 // Initial Setup for the Tech Tree DAG
 const setupTechTree = () => {
   const g = new Graph();
-  
+
   // Tier 1: Raw Materials
   g.addNode('silicon', { name: 'Silicon', tier: 1, icon: <FaGem className="text-cyan-400" /> });
   g.addNode('copper', { name: 'Copper', tier: 1, icon: <FaCube className="text-orange-400" /> });
-  
-  // Tier 2: Components
+  g.addNode('iron', { name: 'Iron', tier: 1, icon: <GiMetalBar className="text-gray-400" /> });
+  g.addNode('carbon', { name: 'Carbon', tier: 1, icon: <GiStoneStack className="text-slate-500" /> });
+
+  // Tier 2: Basic Components
   g.addNode('microchip', { name: 'Microchip', tier: 2, icon: <GiProcessor className="text-green-400" /> });
   g.addNode('pcb', { name: 'PCB', tier: 2, icon: <GiCircuitry className="text-emerald-500" /> });
-  
-  // Tier 3: Advanced Parts
+  g.addNode('wire', { name: 'Wire', tier: 2, icon: <FaBolt className="text-yellow-400" /> });
+  g.addNode('frame', { name: 'Frame', tier: 2, icon: <FaLayerGroup className="text-zinc-400" /> });
+
+  // Tier 3: Advanced Components
   g.addNode('ram', { name: 'RAM', tier: 3, icon: <FaMemory className="text-blue-400" /> });
   g.addNode('cpu', { name: 'CPU', tier: 3, icon: <MdMemory className="text-purple-400" /> });
-  g.addNode('pc', { name: 'High-End PC', tier: 3, icon: <FaDesktop className="text-indigo-400" /> });
+  g.addNode('gpu', { name: 'GPU', tier: 3, icon: <FaMicrochip className="text-pink-400" /> });
+  g.addNode('battery', { name: 'Battery', tier: 3, icon: <FaCarBattery className="text-lime-400" /> });
+
+  // Tier 4: Final Products
+  g.addNode('pc', { name: 'High-End PC', tier: 4, icon: <FaDesktop className="text-indigo-400" /> });
+  g.addNode('laptop', { name: 'MacBook Pro', tier: 4, icon: <FaLaptop className="text-slate-300" /> });
+  g.addNode('server', { name: 'AI Server', tier: 4, icon: <FaServer className="text-red-400" /> });
+  g.addNode('tablet', { name: 'iPad Ultra', tier: 4, icon: <FaTabletAlt className="text-cyan-300" /> });
 
   // Edges (Prerequisites)
+  // Tier 2
   g.addEdge('silicon', 'microchip', 2);
   g.addEdge('copper', 'pcb', 3);
+  g.addEdge('copper', 'wire', 2);
+  g.addEdge('iron', 'wire', 1);
+  g.addEdge('iron', 'frame', 3);
+  g.addEdge('carbon', 'frame', 2);
+
+  // Tier 3
   g.addEdge('microchip', 'ram', 2);
   g.addEdge('pcb', 'ram', 1);
-  g.addEdge('microchip', 'cpu', 1);
+  g.addEdge('microchip', 'cpu', 2);
   g.addEdge('silicon', 'cpu', 1);
-  g.addEdge('ram', 'pc', 1);
+  g.addEdge('microchip', 'gpu', 2);
+  g.addEdge('wire', 'gpu', 3);
+  g.addEdge('frame', 'battery', 1);
+  g.addEdge('carbon', 'battery', 5);
+
+  // Tier 4
+  g.addEdge('ram', 'pc', 2);
   g.addEdge('cpu', 'pc', 1);
+  g.addEdge('gpu', 'pc', 1);
   g.addEdge('silicon', 'pc', 5);
-  g.addEdge('copper', 'pc', 5);
+
+  g.addEdge('cpu', 'laptop', 1);
+  g.addEdge('ram', 'laptop', 1);
+  g.addEdge('battery', 'laptop', 1);
+  g.addEdge('frame', 'laptop', 1);
+
+  g.addEdge('cpu', 'server', 4);
+  g.addEdge('gpu', 'server', 4);
+  g.addEdge('ram', 'server', 8);
+  g.addEdge('wire', 'server', 10);
+
+  g.addEdge('microchip', 'tablet', 4);
+  g.addEdge('battery', 'tablet', 1);
+  g.addEdge('frame', 'tablet', 1);
+  g.addEdge('silicon', 'tablet', 3);
 
   return g;
 };
@@ -51,7 +95,7 @@ function App() {
   const [logs, setLogs] = useState([]);
   const [autoMiners, setAutoMiners] = useState({ silicon: 0, copper: 0 });
   const [flash, setFlash] = useState({}); // { itemId: 'red' | 'green' }
-  
+
   const terminalRef = useRef(null);
 
   // Auto-miners interval
@@ -62,7 +106,7 @@ function App() {
         silicon: prev.silicon + autoMiners.silicon,
         copper: prev.copper + autoMiners.copper,
       }));
-      
+
       // Also update the internal graph nodes for consistency
       graph.nodes.silicon.inventoryCount += autoMiners.silicon;
       graph.nodes.copper.inventoryCount += autoMiners.copper;
@@ -70,21 +114,28 @@ function App() {
     return () => clearInterval(interval);
   }, [autoMiners, graph]);
 
-  // Scroll terminal to bottom
+  // Scroll terminal to bottom only if user is already near the bottom
   useEffect(() => {
     if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+      const { scrollTop, scrollHeight, clientHeight } = terminalRef.current;
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100;
+      if (isAtBottom) {
+        terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+      }
     }
   }, [logs]);
 
   const addLog = (message, type = 'info') => {
     const timestamp = new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    setLogs(prev => [...prev, { message, type, timestamp }]);
+    setLogs(prev => {
+      const combined = [...prev, { message, type, timestamp }];
+      return combined.slice(-100);
+    });
   };
 
   const handleAction = (itemId) => {
     const node = graph.nodes[itemId];
-    
+
     if (node.tier === 1) {
       // Mining
       setInventory(prev => {
@@ -92,11 +143,12 @@ function App() {
         graph.nodes[itemId].inventoryCount = newVal;
         return { ...prev, [itemId]: newVal };
       });
+      addLog(`> Successfully mined 1 ${node.name}.`, 'info');
       triggerFlash(itemId, 'green');
     } else {
       // Crafting with DFS validation
       const canCraft = graph.validateCraft(itemId, addLog);
-      
+
       if (canCraft) {
         graph.performCraft(itemId);
         // Sync back to React state
@@ -123,7 +175,7 @@ function App() {
   const buyAutoMiner = (type) => {
     const cost = type === 'silicon' ? 5 : 5; // Costs 5 microchips for silicon, 5 PCBs for copper
     const costItem = type === 'silicon' ? 'microchip' : 'pcb';
-    
+
     if (inventory[costItem] >= cost) {
       setInventory(prev => {
         const newVal = prev[costItem] - cost;
@@ -137,7 +189,7 @@ function App() {
     }
   };
 
-  const tiers = [1, 2, 3];
+  const tiers = [1, 2, 3, 4];
 
   return (
     <div className="min-h-screen bg-[#121212] flex flex-col text-gray-200 overflow-hidden">
@@ -164,26 +216,29 @@ function App() {
       <main className="flex-1 overflow-y-auto p-8 relative">
         {/* Background Grid Pattern */}
         <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ff9d00 0.5px, transparent 0.5px)', backgroundSize: '24px 24px' }}></div>
-        
+
         <div className="max-w-6xl mx-auto space-y-16 relative z-10">
           {tiers.map(tier => (
             <div key={tier} className="flex flex-wrap justify-center gap-10">
               {Object.entries(graph.nodes)
                 .filter(([_, node]) => node.tier === tier)
                 .map(([id, node]) => (
-                  <div 
-                    key={id} 
+                  <div
+                    key={id}
                     className={`node-card w-56 p-5 rounded-xl border-2 flex flex-col items-center gap-4 relative group
                       ${flash[id] === 'green' ? 'flash-green' : flash[id] === 'red' ? 'flash-red' : 'border-gray-800'}`}
                   >
                     <div className="absolute -top-3 -left-3 bg-[#1a1a1a] border border-[#ff9d00] px-2 py-0.5 rounded text-[10px] font-bold text-[#ff9d00] uppercase tracking-widest">
-                      Tier {tier}
+                      {tier === 1 ? 'Tier 1 — Raw Materials' :
+                        tier === 2 ? 'Tier 2 — Basic Components' :
+                          tier === 3 ? 'Tier 3 — Advanced Components' :
+                            'Tier 4 — Final Products'}
                     </div>
-                    
+
                     <div className="text-5xl group-hover:scale-110 transition-transform duration-300">
                       {node.icon}
                     </div>
-                    
+
                     <div className="text-center">
                       <h3 className="font-bold text-lg text-white">{node.name}</h3>
                       <p className="text-sm text-gray-400">Stock: <span className="font-mono text-[#ff9d00]">{inventory[id] || 0}</span></p>
@@ -206,8 +261,8 @@ function App() {
                     <button
                       onClick={() => handleAction(id)}
                       className={`w-full py-2.5 rounded-lg font-bold uppercase tracking-widest transition-all duration-200 flex items-center justify-center gap-2
-                        ${tier === 1 
-                          ? 'bg-[#ff9d00] text-black hover:bg-[#e68a00] shadow-[0_4px_0_#b36e00] active:translate-y-1 active:shadow-none' 
+                        ${tier === 1
+                          ? 'bg-[#ff9d00] text-black hover:bg-[#e68a00] shadow-[0_4px_0_#b36e00] active:translate-y-1 active:shadow-none'
                           : 'bg-[#2d2d2d] border border-gray-600 hover:border-[#ff9d00] hover:text-[#ff9d00]'}`}
                     >
                       {tier === 1 ? <GiMineWagon /> : <FaHammer />}
@@ -236,7 +291,7 @@ function App() {
                   <p className="text-[10px] text-gray-400">Yield: +{autoMiners.silicon}/s</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => buyAutoMiner('silicon')}
                 className="px-3 py-1.5 bg-[#333] hover:bg-[#444] rounded text-[10px] font-bold border border-gray-600 transition-colors"
               >
@@ -252,19 +307,23 @@ function App() {
                   <p className="text-[10px] text-gray-400">Yield: +{autoMiners.copper}/s</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => buyAutoMiner('copper')}
                 className="px-3 py-1.5 bg-[#333] hover:bg-[#444] rounded text-[10px] font-bold border border-gray-600 transition-colors"
               >
                 Buy (5 PCBs)
               </button>
             </div>
+
+            <div className="bg-[#252525] p-3 rounded-lg border border-gray-700 flex items-center justify-between opacity-50">
+              <p className="text-[10px] text-gray-500 italic">More upgrades coming soon...</p>
+            </div>
           </div>
         </div>
 
         {/* Right: Terminal Log */}
-        <div className="col-span-8 p-0 flex flex-col terminal-window">
-          <div className="bg-[#252525] px-4 py-1.5 border-b border-gray-800 flex items-center gap-2 justify-between">
+        <div className="col-span-8 p-0 flex flex-col terminal-window h-full overflow-hidden">
+          <div className="bg-[#252525] px-4 py-1.5 border-b border-gray-800 flex items-center gap-2 justify-between shrink-0">
             <div className="flex items-center gap-2">
               <FaTerminal className="text-xs text-green-500" />
               <span className="text-[10px] font-mono uppercase text-gray-400 tracking-widest">System Log - DFS Traversal Analyzer</span>
@@ -275,9 +334,9 @@ function App() {
               <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
             </div>
           </div>
-          <div 
+          <div
             ref={terminalRef}
-            className="flex-1 overflow-y-auto p-4 font-mono text-[13px] space-y-1 selection:bg-green-500/30"
+            className="flex-1 overflow-y-auto p-4 font-mono text-[13px] space-y-1 selection:bg-green-500/30 bg-black/40 min-h-0 scrollbar-custom"
           >
             {logs.length === 0 && <p className="text-gray-600 italic">No activity detected. Initiate crafting to view DFS trace...</p>}
             {logs.map((log, i) => (
