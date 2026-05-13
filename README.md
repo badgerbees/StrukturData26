@@ -1,16 +1,47 @@
-# React + Vite
+# Silicon Forge Tycoon — Graph Structure Implementation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Silicon Forge Tycoon adalah sebuah aplikasi simulasi industri berbasis web yang dikembangkan untuk mendemonstrasikan penerapan struktur data **Graph** (khususnya *Directed Acyclic Graph* atau DAG) dalam sistem manufaktur yang kompleks. Proyek ini menggunakan algoritma **Depth-First Search (DFS)** untuk melakukan validasi dependensi bahan baku secara rekursif.
 
-Currently, two official plugins are available:
+## 🚀 Deskripsi Project
+Aplikasi ini mensimulasikan alur produksi komponen teknologi dari bahan mentah hingga menjadi produk akhir (seperti MacBook Pro dan AI Server). 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Fitur Utama:
+*   **Graph-Based Tech Tree**: Representasi pohon teknologi menggunakan *Adjacency List*.
+*   **DFS Traversal Analyzer**: Terminal sistem yang menampilkan log penelusuran DFS secara real-time untuk setiap proses *crafting*.
+*   **4-Tier Production Chain**: Alur produksi yang terdiri dari Raw Materials, Basic Components, Advanced Components, hingga Final Products.
+*   **Security System**: Implementasi *Anti-Autoclicker* untuk mencegah spamming dan menjaga stabilitas performa algoritma.
+*   **Modern UI**: Antarmuka premium dengan animasi dinamis menggunakan React dan TailwindCSS.
 
-## React Compiler
+## 🛠️ Tech Stack
+*   **Frontend**: React.js (Hooks, Refs)
+*   **Build Tool**: Vite
+*   **Logic**: Pure JavaScript (Graph Data Structure)
+*   **Styling**: CSS & TailwindCSS
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📦 Cara Install Dependencies
+Pastikan Anda telah menginstal [Node.js](https://nodejs.org/) di sistem Anda.
 
-## Expanding the ESLint configuration
+1.  Clone repository ini:
+    ```bash
+    git clone https://github.com/badgerbees/StrukturData26.git
+    ```
+2.  Masuk ke direktori project:
+    ```bash
+    cd tugasStrukturData
+    ```
+3.  Instal seluruh dependencies yang diperlukan:
+    ```bash
+    npm install
+    ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ⚡ Cara Menjalankan Project
+Setelah proses instalasi dependencies selesai, Anda dapat menjalankan project di lingkungan lokal:
+
+1.  Jalankan server pengembangan (development server):
+    ```bash
+    npm run dev
+    ```
+2.  Buka browser dan akses alamat yang tertera di terminal (biasanya `http://localhost:5173`).
+
+---
+*Proyek ini dikembangkan sebagai bagian dari tugas mata kuliah Struktur Data untuk mendemonstrasikan implementasi algoritma Graph dalam skenario dunia nyata.*
