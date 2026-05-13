@@ -97,6 +97,8 @@ function App() {
   const [flash, setFlash] = useState({}); // { itemId: 'red' | 'green' }
 
   const terminalRef = useRef(null);
+  const lastClickTime = useRef(0);
+  const spamCount = useRef(0);
 
   // Auto-miners interval
   useEffect(() => {
@@ -134,6 +136,22 @@ function App() {
   };
 
   const handleAction = (itemId) => {
+    const now = Date.now();
+    const diff = now - lastClickTime.current;
+
+    if (diff < 200) {
+      spamCount.current++;
+      if (spamCount.current > 5) {
+        addLog("!!! SYSTEM ALERT: Autoclicker detected. Action suppressed.", "error");
+        triggerFlash(itemId, 'red');
+      }
+      return; // Ignore the click
+    }
+    
+    // Reset spam count on valid click
+    spamCount.current = 0;
+    lastClickTime.current = now;
+
     const node = graph.nodes[itemId];
 
     if (node.tier === 1) {
